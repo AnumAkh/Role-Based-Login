@@ -1,0 +1,99 @@
+﻿@model LAB9.ViewModel.UserProfileViewModel
+@{
+    ViewBag.Title = "Manage Profile";
+    Layout = "~/Views/Shared/_UserLayout.cshtml";
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h4><i class="fas fa-user-edit"></i> Manage Your Profile</h4>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("Profile", "User", FormMethod.Post, new { @class = "needs-validation" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                @Html.HiddenFor(model => model.User.UserId)
+                @Html.HiddenFor(model => model.User.CreatedAt)
+                @Html.HiddenFor(model => model.User.Password)
+                @Html.HiddenFor(model => model.User.Role)
+                @Html.HiddenFor(model => model.UserDetail.DetailId)
+                @Html.HiddenFor(model => model.UserDetail.UserId)
+
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <h5 class="border-bottom pb-2 mb-3">Basic Information</h5>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.User.FullName, new { @class = "form-label" })
+                            @Html.EditorFor(model => model.User.FullName, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.User.FullName, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.User.Email, new { @class = "form-label" })
+                            @Html.EditorFor(model => model.User.Email, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.User.Email, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-4">
+                    <div class="col-md-12 mt-4">
+                        <h5 class="border-bottom pb-2 mb-3">Additional Information</h5>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.UserDetail.PhoneNumber, "Phone Number", new { @class = "form-label" })
+                            @Html.EditorFor(model => model.UserDetail.PhoneNumber, new { htmlAttributes = new { @class = "form-control" } })
+                            @Html.ValidationMessageFor(model => model.UserDetail.PhoneNumber, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.UserDetail.DateOfBirth, "Date of Birth", new { @class = "form-label" })
+                            @Html.EditorFor(model => model.UserDetail.DateOfBirth, new { htmlAttributes = new { @class = "form-control", type = "date" } })
+                            @Html.ValidationMessageFor(model => model.UserDetail.DateOfBirth, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            @Html.LabelFor(model => model.UserDetail.Address, "Address", new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.UserDetail.Address, new { @class = "form-control", rows = 3 })
+                            @Html.ValidationMessageFor(model => model.UserDetail.Address, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group mt-3">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <a href="@Url.Action("Dashboard", "User")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left"></i> Back to Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+}
