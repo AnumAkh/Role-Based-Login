@@ -1,0 +1,135 @@
+﻿@model List<Task3.ViewModel.CalendarEventViewModel>
+
+@{
+    ViewBag.Title = "Event Calendar";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.css" />
+    <style>
+        .fc-event {
+            cursor: pointer;
+        }
+
+        .fc-event-remaining {
+            font-size: 10px;
+            padding: 2px;
+            text-align: center;
+        }
+
+        .fc-event-full {
+            background-color: #dc3545 !important;
+            border-color: #dc3545 !important;
+        }
+
+        .fc-event-available {
+            background-color: #28a745 !important;
+            border-color: #28a745 !important;
+        }
+    </style>
+}
+
+<div class="container mt-4">
+    <h2>Event Calendar</h2>
+
+    <div class="card">
+        <div class="card-body">
+            <div id="calendar"></div>
+        </div>
+    </div>
+
+    <div class="mt-3">
+        <a href="@Url.Action("Index", "Event")" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Back to Events List
+        </a>
+    </div>
+</div>
+
+<!-- Event Details Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" role="dialog" aria-labelledby="eventModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="eventModalLabel">Event Details</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="eventDetails">
+                    <p><strong>Title:</strong> <span id="eventTitle"></span></p>
+                    <p><strong>Date:</strong> <span id="eventDate"></span></p>
+                    <p><strong>Time:</strong> <span id="eventTime"></span></p>
+                    <p><strong>Location:</strong> <span id="eventLocation"></span></p>
+                    <p><strong>Availability:</strong> <span id="eventAvailability"></span></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <a id="eventDetailsLink" href="#" class="btn btn-primary">View Details</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fullcalendar/3.10.2/fullcalendar.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            var events = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+
+            $('#calendar').fullCalendar({
+                header: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'month,agendaWeek,agendaDay'
+                },
+                navLinks: true,
+                editable: false,
+                eventLimit: true,
+                events: $.map(events, function(event) {
+                    var className = event.remainingSpots > 0 ? 'fc-event-available' : 'fc-event-full';
+                    return {
+                        id: event.id,
+                        title: event.title,
+                        start: event.start,
+                        end: event.end,
+                        className: className,
+                        location: event.location,
+                        remainingSpots: event.remainingSpots
+                    };
+                }),
+                eventRender: function(event, element) {
+                    // Add remaining spots indication
+                    var spotsText = event.remainingSpots > 0
+                        ? event.remainingSpots + ' spots left'
+                        : 'Fully booked';
+
+                    element.append('<div class="fc-event-remaining">' + spotsText + '</div>');
+                },
+                eventClick: function(calEvent, jsEvent, view) {
+                    // Show event details in modal
+                    $('#eventTitle').text(calEvent.title);
+                    $('#eventDate').text(moment(calEvent.start).format('dddd, MMMM D, YYYY'));
+                    $('#eventTime').text(moment(calEvent.start).format('h:mm A') + ' - ' + moment(calEvent.end).format('h:mm A'));
+                    $('#eventLocation').text(calEvent.location);
+
+                    var availabilityText = calEvent.remainingSpots > 0
+                        ? calEvent.remainingSpots + ' spots remaining'
+                        : 'Fully booked';
+
+                    var availabilityClass = calEvent.remainingSpots > 0 ? 'text-success' : 'text-danger';
+                    $('#eventAvailability').html('<span class="' + availabilityClass + '">' + availabilityText + '</span>');
+
+                    // Update details link
+                    $('#eventDetailsLink').attr('href', '@Url.Action("Details", "Event")/' + calEvent.id);
+
+                    // Show modal
+                    $('#eventModal').modal('show');
+                }
+            });
+        });
+    </script>
+}

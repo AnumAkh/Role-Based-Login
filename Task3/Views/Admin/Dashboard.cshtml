@@ -1,0 +1,225 @@
+﻿@model Task3.ViewModel.AdminDashboardViewModel
+
+@{
+    ViewBag.Title = "Admin Dashboard";
+}
+
+<div class="container-fluid mt-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <h2>Admin Dashboard</h2>
+    <p>Manage events, bookings, and users in the system.</p>
+
+    <div class="row mb-4">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                                Total Events
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalEvents</div>
+                            <small>(@Model.UpcomingEvents upcoming, @Model.PastEvents past)</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-calendar fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="@Url.Action("Events", "Admin")" class="small text-primary">View Details <i class="fa fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
+                                Total Bookings
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalBookings</div>
+                            <small>(@Model.ActiveBookings active bookings)</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-ticket fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="@Url.Action("Bookings", "Admin")" class="small text-success">View Details <i class="fa fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">
+                                Total Users
+                            </div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.TotalUsers</div>
+                            <small>&nbsp;</small>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-users fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="@Url.Action("Users", "Admin")" class="small text-info">View Details <i class="fa fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                Quick Actions
+                            </div>
+                            <a href="@Url.Action("CreateEvent", "Admin")" class="btn btn-sm btn-success mb-1">
+                                <i class="fa fa-plus"></i> Create Event
+                            </a>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fa fa-bolt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <a href="@Url.Action("Events", "Admin")" class="small text-warning">Manage Events <i class="fa fa-arrow-right"></i></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Recent Events</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentEvents.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Date</th>
+                                        <th>Location</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.RecentEvents)
+                                    {
+                                        <tr>
+                                            <td>@item.Title</td>
+                                            <td>@item.EventDate.ToString("MMM d, yyyy")</td>
+                                            <td>@item.Location</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="@Url.Action("EditEvent", "Admin", new { id = item.EventId })" class="btn btn-sm btn-info">
+                                                        <i class="fa fa-edit"></i> Edit
+                                                    </a>
+                                                    <a href="@Url.Action("EventBookings", "Admin", new { id = item.EventId })" class="btn btn-sm btn-primary">
+                                                        <i class="fa fa-users"></i> Bookings
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="@Url.Action("Events", "Admin")" class="btn btn-primary">
+                                <i class="fa fa-list"></i> View All Events
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> No events created yet.
+                        </div>
+                        <a href="@Url.Action("CreateEvent", "Admin")" class="btn btn-success">
+                            <i class="fa fa-plus"></i> Create Event
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">Recent Bookings</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.RecentBookings.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>User</th>
+                                        <th>Event</th>
+                                        <th>Booked On</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.RecentBookings)
+                                    {
+                                        <tr>
+                                            <td>@item.User.FullName</td>
+                                            <td>@item.Event.Title</td>
+                                            <td>@item.BookingDate?.ToString("MMM d, yyyy")</td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="@Url.Action("EventBookings", "Admin", new { id = item.EventId })" class="btn btn-sm btn-primary">
+                                                        <i class="fa fa-info-circle"></i> Details
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-3">
+                            <a href="@Url.Action("Bookings", "Admin")" class="btn btn-success">
+                                <i class="fa fa-list"></i> View All Bookings
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> No bookings yet.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,143 @@
+﻿@model Task3.ViewModel.UserDashboardViewModel
+
+@{
+    ViewBag.Title = "Dashboard";
+}
+
+<div class="container mt-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <h2>Welcome, @Session["FullName"]!</h2>
+    <p>This is your dashboard where you can view your upcoming events and manage your bookings.</p>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Your Upcoming Bookings</h4>
+                </div>
+                <div class="card-body">
+                    @if (Model.UserBookings.Any())
+                    {
+                        <div class="list-group">
+                            @foreach (var booking in Model.UserBookings)
+                            {
+                                <a href="@Url.Action("Details", "Event", new { id = booking.EventId })" class="list-group-item list-group-item-action">
+                                    <div class="d-flex w-100 justify-content-between">
+                                        <h5 class="mb-1">@booking.Title</h5>
+                                        <small>@booking.EventDate.ToString("MMM d, yyyy")</small>
+                                    </div>
+                                    <p class="mb-1">
+                                        <i class="fa fa-clock-o"></i> @booking.StartTime.ToString(@"hh\:mm tt") - @booking.EndTime.ToString(@"hh\:mm tt")<br>
+                                        <i class="fa fa-map-marker"></i> @booking.Location
+                                    </p>
+                                </a>
+                            }
+                        </div>
+                        <div class="mt-3">
+                            <a href="@Url.Action("MyBookings", "User")" class="btn btn-primary">
+                                <i class="fa fa-list"></i> View All Bookings
+                            </a>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle"></i> You don't have any upcoming event bookings.
+                        </div>
+                        <a href="@Url.Action("Index", "Event")" class="btn btn-primary">
+                            <i class="fa fa-calendar"></i> Browse Events
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-header bg-info text-white">
+                    <h4 class="mb-0">Quick Links</h4>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="@Url.Action("Index", "Event")" class="list-group-item list-group-item-action">
+                            <i class="fa fa-calendar"></i> Browse Events
+                        </a>
+                        <a href="@Url.Action("Calendar", "Event")" class="list-group-item list-group-item-action">
+                            <i class="fa fa-calendar-o"></i> Calendar View
+                        </a>
+                        <a href="@Url.Action("MyBookings", "User")" class="list-group-item list-group-item-action">
+                            <i class="fa fa-ticket"></i> My Bookings
+                        </a>
+                        <a href="@Url.Action("Profile", "User")" class="list-group-item list-group-item-action">
+                            <i class="fa fa-user"></i> My Profile
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">Upcoming Events</h4>
+        </div>
+        <div class="card-body">
+            @if (Model.UpcomingEvents.Any())
+            {
+                <div class="row">
+                    @foreach (var item in Model.UpcomingEvents)
+                    {
+                        <div class="col-md-4 mb-4">
+                            <div class="card h-100">
+                                <div class="card-header">
+                                    <h5 class="mb-0">@item.Title</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p>
+                                        <strong><i class="fa fa-calendar"></i> Date:</strong> @item.EventDate.ToString("MMM d, yyyy")<br>
+                                        <strong><i class="fa fa-clock-o"></i> Time:</strong> @item.StartTime.ToString(@"hh\:mm tt")<br>
+                                        <strong><i class="fa fa-map-marker"></i> Location:</strong> @item.Location
+                                    </p>
+
+                                    @{
+                                        int bookedSpots = item.Bookings.Count;
+                                        int remainingSpots = item.Capacity - bookedSpots;
+                                    }
+
+                                    <p class="@(remainingSpots > 0 ? "text-success" : "text-danger")">
+                                        <strong>@(remainingSpots > 0 ? remainingSpots + " spots left" : "Fully booked")</strong>
+                                    </p>
+                                </div>
+                                <div class="card-footer text-center">
+                                    <a href="@Url.Action("Details", "Event", new { id = item.EventId })" class="btn btn-sm btn-primary">
+                                        View Details
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="text-center mt-3">
+                    <a href="@Url.Action("Index", "Event")" class="btn btn-success">
+                        <i class="fa fa-calendar"></i> View All Events
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> No upcoming events are available at this time.
+                </div>
+            }
+        </div>
+    </div>
+</div>

@@ -1,0 +1,86 @@
+﻿@model IEnumerable<Task3.Models.Event>
+
+@{
+    ViewBag.Title = "Events";
+}
+
+<div class="container mt-4">
+    <h2>Upcoming Events</h2>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <p>Discover and book exciting events!</p>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="@Url.Action("Calendar", "Event")" class="btn btn-info">
+                <i class="fa fa-calendar"></i> Calendar View
+            </a>
+        </div>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            No upcoming events are available at this time. Please check back later.
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            @foreach (var item in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">@Html.DisplayFor(modelItem => item.Title)</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">
+                                <strong><i class="fa fa-map-marker"></i> Location:</strong> @Html.DisplayFor(modelItem => item.Location)<br>
+                                <strong><i class="fa fa-calendar"></i> Date:</strong> @item.EventDate.ToString("dddd, MMMM d, yyyy")<br>
+                                <strong><i class="fa fa-clock-o"></i> Time:</strong> @item.StartTime.ToString(@"hh\:mm tt") - @item.EndTime.ToString(@"hh\:mm tt")
+                            </p>
+                            <p class="card-text">
+                                @if (item.Description.Length > 100)
+                                {
+                                    @Html.Raw(item.Description.Substring(0, 100) + "...")
+                                }
+                                else
+                                {
+                                    @Html.Raw(item.Description)
+                                }
+                            </p>
+
+                            @{
+                                int bookedSpots = item.Bookings.Count;
+                                int remainingSpots = item.Capacity - bookedSpots;
+                            }
+
+                            <div class="progress mb-2">
+                                <div class="progress-bar" role="progressbar" style="width: @(((double)bookedSpots / item.Capacity) * 100)%;"
+                                     aria-valuenow="@bookedSpots" aria-valuemin="0" aria-valuemax="@item.Capacity">
+                                    @bookedSpots/@item.Capacity
+                                </div>
+                            </div>
+                            <p class="card-text text-@(remainingSpots > 0 ? "success" : "danger")">
+                                @if (remainingSpots > 0)
+                                {
+                                    <span><strong>@remainingSpots</strong> spots remaining</span>
+                                }
+                                else
+                                {
+                                    <span>Fully booked</span>
+                                }
+                            </p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="@Url.Action("Details", "Event", new { id = item.EventId })" class="btn btn-primary">
+                                View Details
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

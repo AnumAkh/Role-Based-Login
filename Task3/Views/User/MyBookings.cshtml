@@ -1,0 +1,157 @@
+﻿@model EventBookingSystem.ViewModels.MyBookingsViewModel
+
+@{
+    ViewBag.Title = "My Bookings";
+}
+
+<div class="container mt-4">
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @TempData["Success"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <h2>My Bookings</h2>
+    <p>View and manage all your event bookings.</p>
+
+    <ul class="nav nav-tabs mb-4" id="bookingTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <a class="nav-link active" id="upcoming-tab" data-toggle="tab" href="#upcoming" role="tab" aria-controls="upcoming" aria-selected="true">
+                Upcoming Bookings
+                @if (Model.UpcomingBookings.Any())
+                {
+                    <span class="badge badge-primary">@Model.UpcomingBookings.Count</span>
+                }
+            </a>
+        </li>
+        <li class="nav-item" role="presentation">
+            <a class="nav-link" id="past-tab" data-toggle="tab" href="#past" role="tab" aria-controls="past" aria-selected="false">
+                Past Bookings
+                @if (Model.PastBookings.Any())
+                {
+                    <span class="badge badge-secondary">@Model.PastBookings.Count</span>
+                }
+            </a>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="bookingTabsContent">
+        <div class="tab-pane fade show active" id="upcoming" role="tabpanel" aria-labelledby="upcoming-tab">
+            @if (Model.UpcomingBookings.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>Booked On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model.UpcomingBookings)
+                            {
+                                <tr>
+                                    <td>@booking.Event.Title</td>
+                                    <td>@booking.Event.EventDate.ToString("MMM d, yyyy")</td>
+                                    <td>@booking.Event.StartTime.ToString(@"hh\:mm tt") - @booking.Event.EndTime.ToString(@"hh\:mm tt")</td>
+                                    <td>@booking.Event.Location</td>
+                                    <td>@booking.BookingDate?.ToString("MMM d, yyyy")</td>
+                                    <td>
+                                        <div class="btn-group">
+                                            <a href="@Url.Action("Details", "Event", new { id = booking.EventId })" class="btn btn-sm btn-info">
+                                                <i class="fa fa-info-circle"></i> Details
+                                            </a>
+                                            @using (Html.BeginForm("CancelBooking", "Event", FormMethod.Post, new { style = "display:inline;" }))
+                                            {
+                                                @Html.AntiForgeryToken()
+                                                <input type="hidden" name="id" value="@booking.EventId" />
+                                                <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to cancel this booking?');">
+                                                    <i class="fa fa-times"></i> Cancel
+                                                </button>
+                                            }
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> You don't have any upcoming bookings.
+                </div>
+                <a href="@Url.Action("Index", "Event")" class="btn btn-primary">
+                    <i class="fa fa-calendar"></i> Browse Events
+                </a>
+            }
+        </div>
+        <div class="tab-pane fade" id="past" role="tabpanel" aria-labelledby="past-tab">
+            @if (Model.PastBookings.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Location</th>
+                                <th>Booked On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var booking in Model.PastBookings)
+                            {
+                                <tr>
+                                    <td>@booking.Event.Title</td>
+                                    <td>@booking.Event.EventDate.ToString("MMM d, yyyy")</td>
+                                    <td>@booking.Event.StartTime.ToString(@"hh\:mm tt") - @booking.Event.EndTime.ToString(@"hh\:mm tt")</td>
+                                    <td>@booking.Event.Location</td>
+                                    <td>@booking.BookingDate?.ToString("MMM d, yyyy")</td>
+                                    <td>
+                                        <a href="@Url.Action("Details", "Event", new { id = booking.EventId })" class="btn btn-sm btn-info">
+                                            <i class="fa fa-info-circle"></i> Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i> You don't have any past bookings.
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a href="@Url.Action("Dashboard", "User")" class="btn btn-secondary">
+            <i class="fa fa-arrow-left"></i> Back to Dashboard
+        </a>
+    </div>
+</div>
